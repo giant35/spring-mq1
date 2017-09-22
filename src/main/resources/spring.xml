@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+          http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+          http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-4.3.xsd
+          http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+">
+    <bean id="amqConnFactory" class="org.apache.activemq.ActiveMQConnectionFactory" p:brokerURL="tcp://localhost:61616" />        
+    <bean id="queue1" class="org.apache.activemq.command.ActiveMQQueue" p:physicalName="queue1" />
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsMessagingTemplate" p:connectionFactory-ref="amqConnFactory" p:defaultDestination-ref="queue1" />
+    <jms:annotation-driven />
+    <bean id="recv" class="mq1.Recv" />
+    <jms:listener-container connection-factory="amqConnFactory" >
+        <jms:listener destination="queue1" ref="recv" method="onMessage"  />
+    </jms:listener-container>
+    
+    <context:component-scan base-package="mq1" />
+</beans>
